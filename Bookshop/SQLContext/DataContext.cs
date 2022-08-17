@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bookshop.Entity;
 
 namespace Bookshop.SQLContext
 {
@@ -15,5 +16,7 @@ namespace Bookshop.SQLContext
 
         }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Format> Formats { get; set; }
     }
 }

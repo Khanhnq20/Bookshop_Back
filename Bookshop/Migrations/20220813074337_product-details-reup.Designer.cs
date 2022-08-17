@@ -4,14 +4,16 @@ using Bookshop.SQLContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookshop.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220813074337_product-details-reup")]
+    partial class productdetailsreup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +78,8 @@ namespace Bookshop.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
+                    b.HasIndex("BookId")
+                        .IsUnique();
 
                     b.ToTable("Formats");
                 });
@@ -321,8 +324,8 @@ namespace Bookshop.Migrations
             modelBuilder.Entity("Bookshop.Entity.Format", b =>
                 {
                     b.HasOne("Bookshop.Entity.Product", "Book")
-                        .WithMany("Type")
-                        .HasForeignKey("BookId")
+                        .WithOne("Type")
+                        .HasForeignKey("Bookshop.Entity.Format", "BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

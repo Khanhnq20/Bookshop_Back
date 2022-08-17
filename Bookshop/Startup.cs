@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Bookshop.SQLContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -22,6 +23,7 @@ namespace Bookshop
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -51,6 +53,7 @@ namespace Bookshop
                     ClockSkew = TimeSpan.Zero
                 }; 
             });
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddControllers();
             services.AddDbContext<DataContext>(options =>
