@@ -24,7 +24,32 @@ namespace Bookshop.Controllers
         {
             return View();
         }
-
+        [HttpGet("GetGenre")]
+        public async Task<IActionResult> GetGenre()
+        {
+            var show_genre = await _context.Genres.ToListAsync();
+            return Ok(show_genre);
+        }
+        [HttpPost("CreateGenre")]
+        public async Task<IActionResult> CreateGenre([FromBody]GenreCreationDTO request)
+        {
+            var create_genre = _mapper.Map<Genre>(request);
+            await _context.Genres.AddAsync(create_genre);
+            _context.SaveChanges();
+            return Ok("Created");
+        }
+        [HttpDelete("DeleteGenre")]
+        public async Task<IActionResult> DeleteGenre([FromQuery] int id)
+        {
+            var find_genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == id);
+            if(find_genre == null)
+            {
+                return BadRequest("SOS");
+            }
+            _context.Genres.Remove(find_genre);
+            _context.SaveChanges();
+            return Ok("Deleted");
+        }
         [HttpGet("GetProduct")]
         public async Task<IActionResult> GetProduct()
         {
@@ -36,6 +61,8 @@ namespace Bookshop.Controllers
         public async Task<IActionResult> CreateProduct([FromBody]ProductCreationDTO request)
         {
             var create_product = _mapper.Map<Product>(request);
+
+            create_product.Genres.ForEach(genre => _context.Entry(genre).State = EntityState.Unchanged);
             await _context.Products.AddAsync(create_product);
             _context.SaveChanges();
             return Ok("Created");

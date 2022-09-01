@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Bookshop.Entity
+namespace Bookshop.DTOs.Product
 {
-    public class Genre
+    public class GenreCreationDTO
     {
-        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

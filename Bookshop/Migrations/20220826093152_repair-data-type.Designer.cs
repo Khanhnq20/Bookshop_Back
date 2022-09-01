@@ -4,14 +4,16 @@ using Bookshop.SQLContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookshop.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220826093152_repair-data-type")]
+    partial class repairdatatype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,11 +61,11 @@ namespace Bookshop.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("BookId")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Inventory")
-                        .HasColumnType("int");
+                    b.Property<string>("Inventory")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
@@ -79,26 +81,6 @@ namespace Bookshop.Migrations
                     b.HasIndex("BookId");
 
                     b.ToTable("Formats");
-                });
-
-            modelBuilder.Entity("Bookshop.Entity.Genre", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Bookshop.Entity.Product", b =>
@@ -128,6 +110,9 @@ namespace Bookshop.Migrations
 
                     b.Property<DateTime>("PublishDay")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Weight")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -339,14 +324,9 @@ namespace Bookshop.Migrations
                 {
                     b.HasOne("Bookshop.Entity.Product", "Book")
                         .WithMany("Type")
-                        .HasForeignKey("BookId");
-                });
-
-            modelBuilder.Entity("Bookshop.Entity.Genre", b =>
-                {
-                    b.HasOne("Bookshop.Entity.Product", null)
-                        .WithMany("Genres")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Bookshop.SQLContext.ApplicationUser", b =>
