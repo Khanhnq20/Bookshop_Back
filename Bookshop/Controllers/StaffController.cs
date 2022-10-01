@@ -8,29 +8,33 @@ using Bookshop.SQLContext;
 using AutoMapper;
 using Bookshop.DTOs.Product;
 using Microsoft.EntityFrameworkCore;
+using Bookshop.Interface;
+using System.IO;
 
 namespace Bookshop.Controllers
 {
+    [ApiController]
+    [Route("api/staff")]
     public class StaffController : Controller
     {
         private readonly IMapper _mapper;
         private readonly DataContext _context;
-        public StaffController(DataContext context, IMapper mapper)
+        private readonly IFormFileService _formFileService;
+
+        public StaffController(DataContext context, IMapper mapper, IFormFileService formFileService)
         {
             _context = context;
             _mapper = mapper;
+            _formFileService = formFileService;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
-        [HttpGet("GetGenre")]
+
+        [HttpGet("getGenre")]
         public async Task<IActionResult> GetGenre()
         {
             var show_genre = await _context.Genres.ToListAsync();
             return Ok(show_genre);
         }
-        [HttpPost("CreateGenre")]
+        [HttpPost("createGenre")]
         public async Task<IActionResult> CreateGenre([FromBody]GenreCreationDTO request)
         {
             var create_genre = _mapper.Map<Genre>(request);
@@ -38,7 +42,7 @@ namespace Bookshop.Controllers
             _context.SaveChanges();
             return Ok("Created");
         }
-        [HttpDelete("DeleteGenre")]
+        [HttpDelete("deleteGenre")]
         public async Task<IActionResult> DeleteGenre([FromQuery] int id)
         {
             var find_genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == id);
@@ -50,25 +54,28 @@ namespace Bookshop.Controllers
             _context.SaveChanges();
             return Ok("Deleted");
         }
-        [HttpGet("GetProduct")]
+        [HttpGet("getProduct")]
         public async Task<IActionResult> GetProduct()
         {
-            var show_product = await _context.Products.ToListAsync();
+            var show_product = await _context.Products.Include(t => t.Type).ToListAsync();
             return Ok(show_product);
         }
 
-        [HttpPost("CreateProduct")]
-        public async Task<IActionResult> CreateProduct([FromBody]ProductCreationDTO request)
+        [HttpPost("createProduct")]
+        public async Task<IActionResult> CreateProduct([FromForm]ProductCreationDTO request)
         {
+            string filePath = await _formFileService.UploadFileAsync(request.fileImage, "user");
             var create_product = _mapper.Map<Product>(request);
+            create_product.fileImage = filePath;
 
             create_product.Genres.ForEach(genre => _context.Entry(genre).State = EntityState.Unchanged);
-            await _context.Products.AddAsync(create_product);
+
+            _context.Products.Add(create_product);
             _context.SaveChanges();
             return Ok("Created");
         }
 
-        [HttpPut("UpdateProduct")]
+        [HttpPut("updateProduct")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductCreationDTO request,[FromQuery] int id)
         {
             var old_product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
@@ -79,18 +86,24 @@ namespace Bookshop.Controllers
             return Ok("Updated");
         }
 
-        [HttpDelete("DeleteProduct")]
+        [HttpDelete("deleteProduct")]
         public async Task<IActionResult> DeleteProduct([FromQuery] int id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if(product == null)
+            try
             {
-                return BadRequest("SOS");
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+                if(product == null)
+                {
+                    return BadRequest("SOS");
+                }
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+                return Ok("Deleted");
             }
-            _context.Products.Remove(product);
-            _context.SaveChanges();
-            return Ok("Deleted");
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
-
     }
 }

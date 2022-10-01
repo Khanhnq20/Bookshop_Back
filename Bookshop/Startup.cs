@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Bookshop.Interface;
+using Bookshop.Service;
 using Bookshop.SQLContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -34,6 +38,7 @@ namespace Bookshop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,11 +59,16 @@ namespace Bookshop
                 }; 
             });
             services.AddAutoMapper(typeof(Startup));
-
+            services.AddHttpContextAccessor();
+            
             services.AddControllers();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
+            services.AddControllers().AddNewtonsoftJson(option =>
+            {
+                option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
             services.AddSwaggerGen(s =>
             {
@@ -81,6 +91,7 @@ namespace Bookshop
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
+            services.AddScoped<IFormFileService, FormFileService>();
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "Mypolicy", builder =>
@@ -91,6 +102,7 @@ namespace Bookshop
                     builder.AllowAnyMethod();
                 });
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,7 +119,7 @@ namespace Bookshop
                 c.RoutePrefix = String.Empty;
             });
             app.UseHttpsRedirection();
-
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseCors("Mypolicy");

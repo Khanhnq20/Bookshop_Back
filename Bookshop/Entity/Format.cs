@@ -10,7 +10,7 @@ namespace Bookshop.Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Price { get; set; }
+        public int Price { get; set; }
         public Product Book { get; set; }
         public bool IsDefault { get; set; }
         public int Inventory { get; set; }
