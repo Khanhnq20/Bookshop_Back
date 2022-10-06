@@ -10,8 +10,6 @@ namespace Bookshop.Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        [ForeignKey(nameof(Product))]
-        public int? ProductId { get; set; }
-        public Product Product { get; set; }
+        public List<ProductGenre> ProductGenres { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using Bookshop.SQLContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookshop.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221004072437_setRelationship_productGenre")]
+    partial class setRelationship_productGenre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,7 +146,7 @@ namespace Bookshop.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("ProductGenres");
+                    b.ToTable("ProductGenre");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -209,13 +211,13 @@ namespace Bookshop.Migrations
             modelBuilder.Entity("Bookshop.Entity.ProductGenre", b =>
                 {
                     b.HasOne("Bookshop.Entity.Genre", "Genre")
-                        .WithMany("ProductGenres")
+                        .WithMany("GenreProduct")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Bookshop.Entity.Product", "Product")
-                        .WithMany("ProductGenres")
+                        .WithMany("GenreProduct")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

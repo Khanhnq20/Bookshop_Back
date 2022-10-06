@@ -33,5 +33,6 @@ namespace Bookshop.SQLContext
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Format> Formats { get; set; }
         public virtual DbSet<Genre> Genres { get; set; }
+        public virtual DbSet<ProductGenre> ProductGenres { get; set; }
     }
 }

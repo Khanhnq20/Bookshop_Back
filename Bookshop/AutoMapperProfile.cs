@@ -13,7 +13,9 @@ namespace Bookshop
         public AutoMapperProfile()
         {
             CreateMap<ProductCreationDTO, Product>()
-                .ForMember(ent => ent.Genres, dto => dto.MapFrom(p => p.GenreIds.Select(id => new Genre() { Id = id })));
+                .ForMember(ent => ent.ProductGenres, dto => dto.MapFrom(p => p.GenreIds.Select(id => new ProductGenre() { GenreId = id })));
+            CreateMap<ProductUpdateDTO,Product>()
+                .ForMember(ent => ent.ProductGenres, dto => dto.MapFrom(p => p.GenreIds.Select(id => new ProductGenre() { GenreId = id }))); 
             CreateMap<FormatCreationDTO, Format>();
             CreateMap<GenreCreationDTO, Genre>();
         }

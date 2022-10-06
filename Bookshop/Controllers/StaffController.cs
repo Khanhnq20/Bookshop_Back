@@ -10,6 +10,7 @@ using Bookshop.DTOs.Product;
 using Microsoft.EntityFrameworkCore;
 using Bookshop.Interface;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace Bookshop.Controllers
 {
@@ -64,27 +65,57 @@ namespace Bookshop.Controllers
         [HttpPost("createProduct")]
         public async Task<IActionResult> CreateProduct([FromForm]ProductCreationDTO request)
         {
-            string filePath = await _formFileService.UploadFileAsync(request.fileImage, "user");
-            var create_product = _mapper.Map<Product>(request);
-            create_product.fileImage = filePath;
+            try
+            {
+                string filePath = await _formFileService.UploadFileAsync(request.fileImage, "user");
+                var create_product = _mapper.Map<Product>(request);
+                create_product.fileImage = filePath;
 
-            create_product.Genres.ForEach(genre => _context.Entry(genre).State = EntityState.Unchanged);
+                //create_product.GenreProduct.ForEach(genre => _context.Entry(genre).State = EntityState.Unchanged);
 
-            _context.Products.Add(create_product);
-            _context.SaveChanges();
-            return Ok("Created");
+                _context.Products.Add(create_product);
+                _context.SaveChanges();
+                return Ok("Created");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
-        [HttpPut("updateProduct")]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductCreationDTO request,[FromQuery] int id)
+        [HttpGet("getSingleProduct")]
+        public async Task<IActionResult> GetSingleProduct([FromQuery] int id)
+        {
+            var find_product = await _context.Products
+                .Include(p => p.ProductGenres)
+                .Include(p => p.Type)
+                .FirstOrDefaultAsync(p => p.Id == id);
+            return Ok(find_product);
+        }
+        [HttpPut("updateImage")]
+        public async Task<IActionResult> UpdateImage([FromForm] IFormFile request, int id)
         {
             var old_product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            string savedPath = await _formFileService.UploadFileAsync(request, "user");
+            old_product.fileImage = savedPath;
+            _context.Update(old_product);
+            _context.SaveChanges();
+            return Ok("Updated Image");
+        }
+        [HttpPut("updateProduct")]
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdateDTO request, int id)
+        {
+            var old_product = _context.Products
+                .Include(p => p.ProductGenres)
+                .Include(p => p.Type)
+                .FirstOrDefault(p => p.Id == id);
 
-            var update_product = _mapper.Map(request,old_product);
-            _context.Update(update_product);
+            var update_product = _mapper.Map(request, old_product);
+            _context.Products.Update(update_product);
             _context.SaveChanges();
             return Ok("Updated");
         }
+
 
         [HttpDelete("deleteProduct")]
         public async Task<IActionResult> DeleteProduct([FromQuery] int id)
@@ -104,6 +135,13 @@ namespace Bookshop.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpGet("filterProduct")]
+        public async Task<IActionResult> FilterProduct([FromQuery] int id)
+        {
+            var foundRelatedProduct = _context.ProductGenres.Include(p=>p.Product).Where(g => g.GenreId == id);
+            return Ok(foundRelatedProduct.ProjectTo<>)
         }
     }
 }
