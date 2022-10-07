@@ -18,6 +18,11 @@ namespace Bookshop
                 .ForMember(ent => ent.ProductGenres, dto => dto.MapFrom(p => p.GenreIds.Select(id => new ProductGenre() { GenreId = id }))); 
             CreateMap<FormatCreationDTO, Format>();
             CreateMap<GenreCreationDTO, Genre>();
+
+            CreateMap<Product, ProductGetDTO>();
+            CreateMap<Genre, GenresFilterDTO>();
+            CreateMap<ProductGenre, ProductGenresDTO>();
+
         }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Bookshop.Interface;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using AutoMapper.QueryableExtensions;
 
 namespace Bookshop.Controllers
 {
@@ -141,7 +142,7 @@ namespace Bookshop.Controllers
         public async Task<IActionResult> FilterProduct([FromQuery] int id)
         {
             var foundRelatedProduct = _context.ProductGenres.Include(p=>p.Product).Where(g => g.GenreId == id);
-            return Ok(foundRelatedProduct.ProjectTo<>)
+            return Ok(foundRelatedProduct.ProjectTo<ProductGenresDTO>(_mapper.ConfigurationProvider));
         }
     }
 }
