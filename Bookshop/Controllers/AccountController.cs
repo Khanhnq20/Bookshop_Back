@@ -18,6 +18,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Bookshop.Entity;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using Bookshop.DTOs.User;
+using Microsoft.AspNetCore.Http;
 
 namespace Bookshop.Controllers
 {
@@ -25,13 +28,17 @@ namespace Bookshop.Controllers
     [Route("api/accounts")]
     public class AccountController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly DataContext _context;
+        private readonly CookieOptions _cookieOptions;
+
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
+             IMapper mapper,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
             DataContext context
@@ -41,16 +48,65 @@ namespace Bookshop.Controllers
             _signInManager = signInManager;
             _configuration = configuration;
             _context = context;
+            _mapper = mapper;
+            _cookieOptions = new CookieOptions()
+            {
+                Expires = DateTime.UtcNow.AddDays(1),
+                HttpOnly = false,
+                Secure = true,
+                IsEssential = true,
+                Path = "/",
+                Domain = _configuration.GetSection("localhost").Value,
+                SameSite = SameSiteMode.None,
+            };
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> CreateUser([FromBody] UserInfo model)
+        //[HttpPost("register")]
+        //public async Task<IActionResult> CreateUser([FromBody] UserInfo model)
+        //{
+        //    var user = new ApplicationUser { UserName = model.EmailAddress, Email = model.EmailAddress };
+        //    var result = await _userManager.CreateAsync(user, model.Password);
+        //    if (result.Errors.Count() != 0)
+        //    {
+        //        return StatusCode(403,result.Errors);
+        //    }
+        //    return Ok("Registered");
+        //}
+
+
+        [HttpPost("register/admin")]
+        public async Task<IActionResult> CreateAdmin([FromBody] AdminCreateDTO model)
         {
-            var user = new ApplicationUser { UserName = model.EmailAddress, Email = model.EmailAddress };
+            var user = _mapper.Map<Admin>(model);
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Errors.Count() != 0)
             {
-                return StatusCode(403,result.Errors);
+                return StatusCode(403, result.Errors);
+            }
+            return Ok("Registered");
+        }
+
+
+        [HttpPost("register/staff")]
+        public async Task<IActionResult> CreateStaff([FromBody] StaffCreateDTO model)
+        {
+            var user = _mapper.Map<Staff>(model);
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Errors.Count() != 0)
+            {
+                return StatusCode(403, result.Errors);
+            }
+            return Ok("Registered");
+        }
+
+        [HttpPost("register/user")]
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDTO model)
+        {
+            var user = _mapper.Map<User>(model);
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Errors.Count() != 0)
+            {
+                return StatusCode(403, result.Errors);
             }
             return Ok("Registered");
         }
@@ -58,32 +114,20 @@ namespace Bookshop.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] UserInfo model)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.EmailAddress, model.Password
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Email, 
+                model.Password
                 , isPersistent: false, lockoutOnFailure: false
                 );
-            
+
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(model.EmailAddress);
+                var user = await _userManager.FindByEmailAsync(model.Email);
       
-                var tokenResponse = await BuildToken(user.Id,model.EmailAddress);
-                Response.Cookies.Append("jwt", tokenResponse.Token,new Microsoft.AspNetCore.Http.CookieOptions()
-                {
-                    Domain = Request.Host.Host,
-                    Path="/",
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                    HttpOnly=true,
-                    Secure=true
-                });
-                Response.Cookies.Append("r_jwt", tokenResponse.RefreshToken, new Microsoft.AspNetCore.Http.CookieOptions()
-                {
-                    Domain = Request.Host.Host,
-                    Path = "/",
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                    HttpOnly=true,
-                    Secure=true
-
-                });
+                var tokenResponse = await BuildToken(user.Id,model.Email);
+                Response.Cookies.Append("jwt", tokenResponse.Token,_cookieOptions);
+                Response.Cookies.Append("r_jwt", tokenResponse.RefreshToken, _cookieOptions);
+                
                 return Ok(tokenResponse);
             }
             else
@@ -93,10 +137,12 @@ namespace Bookshop.Controllers
 
         }
 
-        [HttpGet("Logout")]
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            Response.Cookies.Delete("jwt", _cookieOptions);
+            Response.Cookies.Delete("r_jwt", _cookieOptions);
             return Ok();
         }
 
@@ -147,7 +193,8 @@ namespace Bookshop.Controllers
 
             if(verifiedToken.Errors[0] == "We cannot refresh this since the token has not expired")
             {
-                return Ok(new { isLogged= true });
+                var userID = GetClaimValue(token, JwtRegisteredClaimNames.NameId);
+                return Ok(new { isLogged= true,userId = userID});
             }
 
             return BadRequest(verifiedToken);
@@ -327,6 +374,23 @@ namespace Bookshop.Controllers
                     Errors = new List<string> {ex.Message},
                     Success = false
                 };
+            }
+        }
+
+        private string GetClaimValue(string token, string claimType)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            
+            try
+            {
+                var securityToken = jwtTokenHandler.ReadJwtToken(token) as JwtSecurityToken;
+                return securityToken.Claims.First(claim => claim.Type == claimType).Value;
+
+            }
+            catch (Exception e)
+            {
+
+                throw e;
             }
         }
 

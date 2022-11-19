@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Bookshop.DTOs.Payment;
 using Bookshop.DTOs.Product;
+using Bookshop.DTOs.User;
 using Bookshop.Entity;
+using Bookshop.SQLContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +25,11 @@ namespace Bookshop
             CreateMap<Product, ProductGetDTO>();
             CreateMap<Genre, GenresFilterDTO>();
             CreateMap<ProductGenre, ProductGenresDTO>();
-
+            CreateMap<AdminCreateDTO, Admin>();
+            CreateMap<StaffCreateDTO, Staff>();
+            CreateMap<UserCreateDTO, User>();
+            CreateMap<PurchasedProductDTO, PurchasedProduct>();
+            CreateMap<PurchasedHistoryDTO, PurchaseHistory>();
         }
     }
 }

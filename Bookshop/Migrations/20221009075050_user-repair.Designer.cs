@@ -4,14 +4,16 @@ using Bookshop.SQLContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookshop.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221009075050_user-repair")]
+    partial class userrepair
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,75 +149,6 @@ namespace Bookshop.Migrations
                     b.ToTable("ProductGenres");
                 });
 
-            modelBuilder.Entity("Bookshop.Entity.PurchaseHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Date")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DeliveryFee")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UniqueCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("confirmStatus")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PurchaseHistories");
-                });
-
-            modelBuilder.Entity("Bookshop.Entity.PurchasedProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("HistoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalProductsFee")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HistoryId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("PurchasedProducts");
-                });
-
             modelBuilder.Entity("Bookshop.SQLContext.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -229,10 +162,6 @@ namespace Bookshop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DayOfBirth")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -297,8 +226,6 @@ namespace Bookshop.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUsers");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -432,27 +359,6 @@ namespace Bookshop.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Bookshop.SQLContext.Admin", b =>
-                {
-                    b.HasBaseType("Bookshop.SQLContext.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("Admin");
-                });
-
-            modelBuilder.Entity("Bookshop.SQLContext.Staff", b =>
-                {
-                    b.HasBaseType("Bookshop.SQLContext.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("Staff");
-                });
-
-            modelBuilder.Entity("Bookshop.SQLContext.User", b =>
-                {
-                    b.HasBaseType("Bookshop.SQLContext.ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("User");
-                });
-
             modelBuilder.Entity("Bookshop.Entity.Format", b =>
                 {
                     b.HasOne("Bookshop.Entity.Product", "Book")
@@ -471,28 +377,6 @@ namespace Bookshop.Migrations
 
                     b.HasOne("Bookshop.Entity.Product", "Product")
                         .WithMany("ProductGenres")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Bookshop.Entity.PurchaseHistory", b =>
-                {
-                    b.HasOne("Bookshop.SQLContext.User", "User")
-                        .WithMany("PurchaseHistories")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Bookshop.Entity.PurchasedProduct", b =>
-                {
-                    b.HasOne("Bookshop.Entity.PurchaseHistory", "PurchaseHistory")
-                        .WithMany("PurchasedProducts")
-                        .HasForeignKey("HistoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bookshop.Entity.Product", "products")
-                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

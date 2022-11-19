@@ -21,12 +21,6 @@ namespace Bookshop.SQLContext
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Ignore<IdentityUserLogin<string>>();
-            builder.Ignore<IdentityUserRole<string>>();
-            builder.Ignore<IdentityUserClaim<string>>();
-            builder.Ignore<IdentityUserToken<string>>();
-            builder.Ignore<IdentityUser<string>>();
-            builder.Ignore<ApplicationUser>();
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -34,5 +28,10 @@ namespace Bookshop.SQLContext
         public virtual DbSet<Format> Formats { get; set; }
         public virtual DbSet<Genre> Genres { get; set; }
         public virtual DbSet<ProductGenre> ProductGenres { get; set; }
+        public virtual DbSet<Admin> Admins { get; set; }
+        public virtual DbSet<Staff> Staffs { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<PurchaseHistory> PurchaseHistories { get; set; }
+        public virtual DbSet<PurchasedProduct> PurchasedProducts { get; set; }
     }
 }

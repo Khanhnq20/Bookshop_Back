@@ -61,6 +61,7 @@ namespace Bookshop
             services.AddAutoMapper(typeof(Startup));
             services.AddHttpContextAccessor();
             
+
             services.AddControllers();
             services.AddDbContext<DataContext>(options =>
             {
@@ -92,6 +93,8 @@ namespace Bookshop
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
             services.AddScoped<IFormFileService, FormFileService>();
+           
+            services.AddScoped<IPayment, Payment>().Configure<VNPayPaymentSetup>(Configuration.GetSection("VNPay"));
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "Mypolicy", builder =>

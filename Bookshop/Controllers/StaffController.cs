@@ -144,5 +144,6 @@ namespace Bookshop.Controllers
             var foundRelatedProduct = _context.ProductGenres.Include(p=>p.Product).Where(g => g.GenreId == id);
             return Ok(foundRelatedProduct.ProjectTo<ProductGenresDTO>(_mapper.ConfigurationProvider));
         }
+
     }
 }

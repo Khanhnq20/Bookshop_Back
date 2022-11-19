@@ -9,8 +9,12 @@ namespace Bookshop.DTOs
     public class UserInfo
     {
         [EmailAddress]
-        [Required]
-        public string EmailAddress { get; set; }
+        public string Email { get; set; }
+        public string UserName { get => this.Email; set => this.UserName = Email; }
         public string Password { get; set; }
+        public string Name { get; set; }
+        public DateTime DayOfBirth { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Gender { get; set; }
     }
 }
