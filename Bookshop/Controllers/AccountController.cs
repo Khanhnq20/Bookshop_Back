@@ -61,6 +61,20 @@ namespace Bookshop.Controllers
             };
         }
 
+        [HttpGet("getPersonal")]
+        public async Task<IActionResult> GetPersonal(string id)
+        {
+            var f_user = await _userManager.FindByIdAsync(id);
+            return Ok(f_user);
+        }
+
+        [HttpGet("getRole")]
+        public async Task<IActionResult> GetRole(string id)
+        {
+            var f_user = await _userManager.FindByIdAsync(id);
+            var type = f_user.GetType().Name;
+            return Ok(type);
+        }
         //[HttpPost("register")]
         //public async Task<IActionResult> CreateUser([FromBody] UserInfo model)
         //{
@@ -190,8 +204,8 @@ namespace Bookshop.Controllers
             }
 
             var verifiedToken = await VerifyToken(new TokenRequest() { Token = token, RefreshToken = refreshToken });
-
-            if(verifiedToken.Errors[0] == "We cannot refresh this since the token has not expired")
+            
+            if(verifiedToken.GetType().GetProperty("Errors") != null  && verifiedToken?.Errors[0] == "We cannot refresh this since the token has not expired")
             {
                 var userID = GetClaimValue(token, JwtRegisteredClaimNames.NameId);
                 return Ok(new { isLogged= true,userId = userID});
