@@ -13,7 +13,7 @@ namespace Bookshop.Entity
 
         [ForeignKey(nameof(User))]
         public string UserId { get; set; }
-        public User User { get; set; }
+        public ApplicationUser User { get; set; }
 
         public string UniqueCode { get; set; }
         public string PhoneNumber { get; set; }
