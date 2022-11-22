@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Bookshop.SQLContext
 {
-    public class DataContext : IdentityDbContext<ApplicationUser>
+    public class DataContext : IdentityDbContext
     {
         public DataContext(DbContextOptions<DataContext> options): base(options)
         {
@@ -33,5 +33,6 @@ namespace Bookshop.SQLContext
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<PurchaseHistory> PurchaseHistories { get; set; }
         public virtual DbSet<PurchasedProduct> PurchasedProducts { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
     }
 }

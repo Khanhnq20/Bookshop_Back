@@ -2,6 +2,7 @@
 using Bookshop.Entity;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bookshop.SQLContext
 {
@@ -11,6 +12,7 @@ namespace Bookshop.SQLContext
         public string DayOfBirth { get; set; }
         public string Gender { get; set; }
         public RefreshToken refreshToken { get; set; }
+
     }
 
 

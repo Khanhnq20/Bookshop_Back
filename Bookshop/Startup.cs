@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -44,6 +45,7 @@ namespace Bookshop
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                
             }).AddJwtBearer(jwt => {
                 jwt.SaveToken = true;
                 jwt.TokenValidationParameters = new TokenValidationParameters
@@ -60,13 +62,14 @@ namespace Bookshop
             });
             services.AddAutoMapper(typeof(Startup));
             services.AddHttpContextAccessor();
-            
-
-            services.AddControllers();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddDefaultIdentity<ApplicationUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+
+            //services.AddIdentityCore<ApplicationUser,Role>()
+
             services.AddControllers().AddNewtonsoftJson(option =>
             {
                 option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -89,9 +92,15 @@ namespace Bookshop
                 s.OperationFilter<SecurityRequirementsOperationFilter>();
 
             });
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<DataContext>()
-                .AddDefaultTokenProviders();
+            //services.AddIdentity<ApplicationUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<DataContext>()
+            //    .AddDefaultTokenProviders();
+
+            services.AddAuthorization(op =>
+            {
+                op.AddPolicy("Admin", p => p.RequireAuthenticatedUser().RequireClaim(ClaimTypes.Role, "Admin"));
+            });
+
             services.AddScoped<IFormFileService, FormFileService>();
            
             services.AddScoped<IPayment, Payment>().Configure<VNPayPaymentSetup>(Configuration.GetSection("VNPay"));

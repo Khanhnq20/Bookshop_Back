@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bookshop.DTOs
 {
-    public class UserToken
+    public class UserToken 
     {
         public string Token { get; set; }
         public string RefreshToken { get; set; }

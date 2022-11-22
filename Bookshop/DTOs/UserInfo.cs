@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bookshop.DTOs
 {
-    public class UserInfo
+    public class UserInfo 
     {
         [EmailAddress]
         public string Email { get; set; }
@@ -16,5 +16,6 @@ namespace Bookshop.DTOs
         public DateTime DayOfBirth { get; set; }
         public string PhoneNumber { get; set; }
         public string Gender { get; set; }
+        public string Role { get; set; }
     }
 }

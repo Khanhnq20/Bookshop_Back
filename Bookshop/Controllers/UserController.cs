@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Bookshop.DTOs.Payment;
+using Bookshop.DTOs.Product;
 using Bookshop.Entity;
 using Bookshop.Service;
 using Bookshop.SQLContext;
@@ -44,6 +45,24 @@ namespace Bookshop.Controllers
             _context.SaveChanges();
             return Ok(purchaseHistory);
         }
-        
+
+        [HttpPost("comment")]
+        public async Task<IActionResult> Comment([FromBody]CommentCreationDTO request)
+        {
+            var comment = _mapper.Map<Comment>(request);
+            _context.Comments.Add(comment);
+            _context.SaveChanges();
+            return Ok("Success");
+        }
+
+
+        [HttpGet("getComment")]
+        public async Task<IActionResult> GetComment(int id)
+        {
+            var comment = await _context.Comments.Where(p =>p.ProductId == id).ToListAsync();
+
+            return Ok(comment);
+        }
+
     }
 }

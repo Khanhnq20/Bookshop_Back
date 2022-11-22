@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Bookshop.SQLContext;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace Bookshop.Controllers
 {   
     [ApiController]
     [Route("api/admin")]
+    [Authorize(Roles = "admin")]
     public class AdminController : Controller
     {
         private readonly IMapper _mapper;
@@ -27,7 +29,8 @@ namespace Bookshop.Controllers
             _configuration = configuration;
             _context = context;
         }
-
+        
+        [AllowAnonymous]
         [HttpGet("getUser")]
         public async Task<IActionResult> UserManagement()
         {
@@ -35,6 +38,7 @@ namespace Bookshop.Controllers
             return Ok(users);
         }
 
+        [AllowAnonymous]
         [HttpGet("getStaff")]
         public async Task<IActionResult> StaffManagement()
         {
@@ -67,14 +71,24 @@ namespace Bookshop.Controllers
             return Ok(history);
         }
 
+        
         [HttpPost("changePassword")]
         public async Task<IActionResult> ChangePassword(string id,string password)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(f => f.Id == id);
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, password);
+            try
+            {
+                var user = await _userManager.Users.FirstOrDefaultAsync(f => f.Id == id);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, password);
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+
+                return BadRequest(e.Message);
+            }
+            
         }
     }
 }

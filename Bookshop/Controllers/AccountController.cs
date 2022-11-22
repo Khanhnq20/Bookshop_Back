@@ -31,6 +31,8 @@ namespace Bookshop.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+      
         private readonly IConfiguration _configuration;
         private readonly DataContext _context;
         private readonly CookieOptions _cookieOptions;
@@ -38,14 +40,16 @@ namespace Bookshop.Controllers
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
-             IMapper mapper,
+            IMapper mapper,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
             DataContext context
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _configuration = configuration;
             _context = context;
             _mapper = mapper;
@@ -72,8 +76,13 @@ namespace Bookshop.Controllers
         public async Task<IActionResult> GetRole(string id)
         {
             var f_user = await _userManager.FindByIdAsync(id);
-            var type = f_user.GetType().Name;
-            return Ok(type);
+
+            string type = f_user.GetType().Name;
+            if (!string.IsNullOrEmpty(type))
+            {
+                return Ok(type);
+            }
+            return Ok("");
         }
         //[HttpPost("register")]
         //public async Task<IActionResult> CreateUser([FromBody] UserInfo model)
@@ -88,11 +97,16 @@ namespace Bookshop.Controllers
         //}
 
 
+
         [HttpPost("register/admin")]
         public async Task<IActionResult> CreateAdmin([FromBody] AdminCreateDTO model)
         {
             var user = _mapper.Map<Admin>(model);
             var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "admin");
+            }
             if (result.Errors.Count() != 0)
             {
                 return StatusCode(403, result.Errors);
@@ -106,6 +120,10 @@ namespace Bookshop.Controllers
         {
             var user = _mapper.Map<Staff>(model);
             var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "staff");
+            }
             if (result.Errors.Count() != 0)
             {
                 return StatusCode(403, result.Errors);
@@ -118,6 +136,11 @@ namespace Bookshop.Controllers
         {
             var user = _mapper.Map<User>(model);
             var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user,"user");
+            }
             if (result.Errors.Count() != 0)
             {
                 return StatusCode(403, result.Errors);
@@ -137,8 +160,11 @@ namespace Bookshop.Controllers
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
+                var userRole = await _context.UserRoles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+                var role = await _roleManager.FindByIdAsync(userRole.RoleId);
+
       
-                var tokenResponse = await BuildToken(user.Id,model.Email);
+                var tokenResponse = await BuildToken(user.Id,model.Email, role.Name);
                 Response.Cookies.Append("jwt", tokenResponse.Token,_cookieOptions);
                 Response.Cookies.Append("r_jwt", tokenResponse.RefreshToken, _cookieOptions);
                 
@@ -149,6 +175,14 @@ namespace Bookshop.Controllers
                 return BadRequest(result);
             }
 
+        }
+
+        [HttpPost("createRole")]
+        public async Task<IActionResult> CreateRole(string role)
+        {
+            var result = await _roleManager.CreateAsync(new IdentityRole(role));
+
+            return Ok("Registered");
         }
 
         [HttpGet("logout")]
@@ -214,7 +248,7 @@ namespace Bookshop.Controllers
             return BadRequest(verifiedToken);
         }
 
-        private async Task<AuthResult> BuildToken(string userId,string emailAdress)
+        private async Task<AuthResult> BuildToken(string userId,string emailAdress,string role)
         {
             try
             {
@@ -222,6 +256,7 @@ namespace Bookshop.Controllers
                 {    
                     new Claim(JwtRegisteredClaimNames.NameId, userId),
                     new Claim(JwtRegisteredClaimNames.Email,emailAdress),
+                    new Claim(ClaimTypes.Role,role),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
@@ -380,7 +415,10 @@ namespace Bookshop.Controllers
                 await _context.SaveChangesAsync();
 
                 var dbUser = await _userManager.FindByIdAsync(storedRefreshToken.UserId);
-                return await BuildToken(dbUser.Id,dbUser.Email);
+                var userRole = _context.UserRoles.FirstOrDefault(p => p.UserId == dbUser.Id);
+                var role = await _roleManager.FindByIdAsync(userRole.RoleId);
+
+                return await BuildToken(dbUser.Id,dbUser.Email,role.Name);
             }
             catch (Exception ex)
             {

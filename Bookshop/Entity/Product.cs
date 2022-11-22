@@ -19,5 +19,6 @@ namespace Bookshop.Entity
         public string fileImage { get; set; }
         public List<ProductGenre> ProductGenres { get; set; }
         public List<Format> Type { get; set; }
+        public List<Comment> comments { get; set; }
     }
 }

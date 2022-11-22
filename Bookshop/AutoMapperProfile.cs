@@ -30,6 +30,7 @@ namespace Bookshop
             CreateMap<UserCreateDTO, User>();
             CreateMap<PurchasedProductDTO, PurchasedProduct>();
             CreateMap<PurchasedHistoryDTO, PurchaseHistory>();
+            CreateMap<CommentCreationDTO, Comment>();
         }
     }
 }
