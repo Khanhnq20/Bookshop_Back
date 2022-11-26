@@ -32,27 +32,43 @@ namespace Bookshop.Controllers
         
         [AllowAnonymous]
         [HttpGet("getUser")]
-        public async Task<IActionResult> UserManagement()
+        public async Task<IActionResult> UserManagement(string searchString)
         {
             var users = await _context.Users.ToListAsync();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var f_user = await _context.Users.Where(s => (s.Name.Contains(searchString) || s.Email.Contains(searchString))).ToListAsync();
+                return Ok(f_user);
+            }
             return Ok(users);
         }
 
-        [AllowAnonymous]
+
         [HttpGet("getStaff")]
-        public async Task<IActionResult> StaffManagement()
+        public async Task<IActionResult> StaffManagement(string searchString)
         {
             var staffs = await _context.Staffs.ToListAsync();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var f_user = await _context.Staffs.Where(s => (s.Name.Contains(searchString) || s.Email.Contains(searchString))).ToListAsync();
+                return Ok(f_user);
+            }
             return Ok(staffs);
         }
 
         [HttpGet("getPurchaseHistory")]
-        public async Task<IActionResult> GetPurchaseHistory()
+        public async Task<IActionResult> GetPurchaseHistory(string searchString)
         {
             var history = await _context.PurchaseHistories.Include(u => u.User).ToListAsync();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var f_history = await _context.PurchaseHistories.Where(s => (s.Date.Contains(searchString) || s.User.Email.Contains(searchString))).ToListAsync();
+                return Ok(f_history);
+            }
             return Ok(history);
         }
 
+        [AllowAnonymous]
         [HttpGet("getSingleUser")]
         public async Task<IActionResult> getSingleUser(string id)
         {
@@ -60,6 +76,7 @@ namespace Bookshop.Controllers
             return Ok(user);
         }
 
+        [AllowAnonymous]
         [HttpGet("getSinglePurchaseHistory")]
         public async Task<IActionResult> GetSinglePurchaseHistory(int id)
         {

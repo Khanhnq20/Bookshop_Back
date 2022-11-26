@@ -145,5 +145,44 @@ namespace Bookshop.Controllers
             return Ok(foundRelatedProduct.ProjectTo<ProductGenresDTO>(_mapper.ConfigurationProvider));
         }
 
+        [HttpGet("searchProduct")]
+        public async Task<IActionResult> SearchProduct(string searchString)
+        {
+            var products = await _context.Products.ToListAsync();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var f_products = await _context.Products.Where(s => s.Name.Contains(searchString)).ToListAsync();
+                return Ok(f_products);
+            }
+
+            return Ok(products);
+        }
+
+        [HttpGet("searchGenre")]
+        public async Task<IActionResult> SearchGenre(string searchString)
+        {
+            var genres = await _context.Genres.ToListAsync();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var f_genres = await _context.Genres.Where(s => s.Name.Contains(searchString)).ToListAsync();
+                return Ok(f_genres);
+            }
+
+            return Ok(genres);
+        }
+
+        [HttpGet("searchProductMain")]
+        public async Task<IActionResult> SearchProductMain(string searchString)
+        {
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var f_products = await _context.Products.Where(s => s.Name.Contains(searchString)).ToListAsync();
+                return Ok(f_products);
+            }
+            return Ok();
+        }
+
     }
 }

@@ -242,7 +242,8 @@ namespace Bookshop.Controllers
             if(verifiedToken.GetType().GetProperty("Errors") != null  && verifiedToken?.Errors[0] == "We cannot refresh this since the token has not expired")
             {
                 var userID = GetClaimValue(token, JwtRegisteredClaimNames.NameId);
-                return Ok(new { isLogged= true,userId = userID});
+                var role = GetClaimValue(token,ClaimTypes.Role );
+                return Ok(new { isLogged= true,userId = userID,identity = role});
             }
 
             return BadRequest(verifiedToken);

@@ -64,5 +64,15 @@ namespace Bookshop.Controllers
             return Ok(comment);
         }
 
+        [HttpGet("getPurchased")]
+        public async Task<IActionResult> GetPurchased(string id)
+        {
+            var history = await _context.PurchaseHistories
+                .Include(u => u.User)
+                .Include(t => t.PurchasedProducts)
+                    .ThenInclude(p => p.products)
+                   .Where(p => p.UserId == id).ToListAsync();
+            return Ok(history);
+        }
     }
 }
