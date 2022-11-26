@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Bookshop.DTOs.User;
 using Bookshop.SQLContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -106,6 +107,14 @@ namespace Bookshop.Controllers
                 return BadRequest(e.Message);
             }
             
+        }
+        [HttpPost("userUpdate")]
+        public async Task<IActionResult> UserUpdate([FromBody]UserUpdateDTO request, string id)
+        {
+                var user = await _userManager.Users.FirstOrDefaultAsync(f => f.Id == id);
+                var update_user = _mapper.Map(request, user);
+                await _userManager.UpdateAsync(update_user);
+                return Ok();
         }
     }
 }

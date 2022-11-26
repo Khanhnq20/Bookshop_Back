@@ -22,6 +22,7 @@ namespace Bookshop
             CreateMap<FormatCreationDTO, Format>();
             CreateMap<GenreCreationDTO, Genre>();
 
+            CreateMap<UserUpdateDTO, ApplicationUser>();
             CreateMap<Product, ProductGetDTO>();
             CreateMap<Genre, GenresFilterDTO>();
             CreateMap<ProductGenre, ProductGenresDTO>();
