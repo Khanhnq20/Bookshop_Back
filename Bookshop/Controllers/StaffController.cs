@@ -12,9 +12,11 @@ using Bookshop.Interface;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bookshop.Controllers
 {
+    [Authorize(Roles = "staff")]
     [ApiController]
     [Route("api/staff")]
     public class StaffController : Controller
@@ -29,7 +31,7 @@ namespace Bookshop.Controllers
             _mapper = mapper;
             _formFileService = formFileService;
         }
-
+        [AllowAnonymous]
         [HttpGet("getGenre")]
         public async Task<IActionResult> GetGenre()
         {
@@ -56,6 +58,7 @@ namespace Bookshop.Controllers
             _context.SaveChanges();
             return Ok("Deleted");
         }
+        [AllowAnonymous]
         [HttpGet("getProduct")]
         public async Task<IActionResult> GetProduct()
         {
@@ -83,7 +86,7 @@ namespace Bookshop.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-
+        [AllowAnonymous]
         [HttpGet("getSingleProduct")]
         public async Task<IActionResult> GetSingleProduct([FromQuery] int id)
         {
@@ -137,14 +140,14 @@ namespace Bookshop.Controllers
                 return BadRequest(e.Message);
             }
         }
-
+        [AllowAnonymous]
         [HttpGet("filterProduct")]
         public async Task<IActionResult> FilterProduct([FromQuery] int id)
         {
             var foundRelatedProduct = _context.ProductGenres.Include(p=>p.Product).Where(g => g.GenreId == id);
             return Ok(foundRelatedProduct.ProjectTo<ProductGenresDTO>(_mapper.ConfigurationProvider));
         }
-
+        [AllowAnonymous]
         [HttpGet("searchProduct")]
         public async Task<IActionResult> SearchProduct(string searchString)
         {
@@ -172,7 +175,7 @@ namespace Bookshop.Controllers
 
             return Ok(genres);
         }
-
+        [AllowAnonymous]
         [HttpGet("searchProductMain")]
         public async Task<IActionResult> SearchProductMain(string searchString)
         {

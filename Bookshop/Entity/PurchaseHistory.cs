@@ -22,6 +22,7 @@ namespace Bookshop.Entity
         public string PaymentMethod { get; set; }
         public int DeliveryFee { get; set; }
         public string Date { get; set; }
+        public bool Verify { get; set; }
         public List<PurchasedProduct> PurchasedProducts { get; set; }
     }
 

@@ -8,12 +8,14 @@ using Bookshop.DTOs.Product;
 using Bookshop.Entity;
 using Bookshop.Service;
 using Bookshop.SQLContext;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookshop.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "user")]
     [Route("api/user")]
     public class UserController : Controller
     {
@@ -45,7 +47,7 @@ namespace Bookshop.Controllers
             _context.SaveChanges();
             return Ok(purchaseHistory);
         }
-
+        [AllowAnonymous]
         [HttpPost("comment")]
         public async Task<IActionResult> Comment([FromBody]CommentCreationDTO request)
         {
@@ -55,7 +57,7 @@ namespace Bookshop.Controllers
             return Ok("Success");
         }
 
-
+        [AllowAnonymous]
         [HttpGet("getComment")]
         public async Task<IActionResult> GetComment(int id)
         {
@@ -74,5 +76,6 @@ namespace Bookshop.Controllers
                    .Where(p => p.UserId == id).ToListAsync();
             return Ok(history);
         }
+
     }
 }

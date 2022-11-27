@@ -97,7 +97,7 @@ namespace Bookshop.Controllers
         //}
 
 
-
+        [Authorize(Roles = "admin")]
         [HttpPost("register/admin")]
         public async Task<IActionResult> CreateAdmin([FromBody] AdminCreateDTO model)
         {
@@ -114,7 +114,7 @@ namespace Bookshop.Controllers
             return Ok("Registered");
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpPost("register/staff")]
         public async Task<IActionResult> CreateStaff([FromBody] StaffCreateDTO model)
         {
@@ -175,14 +175,6 @@ namespace Bookshop.Controllers
                 return BadRequest(result);
             }
 
-        }
-
-        [HttpPost("createRole")]
-        public async Task<IActionResult> CreateRole(string role)
-        {
-            var result = await _roleManager.CreateAsync(new IdentityRole(role));
-
-            return Ok("Registered");
         }
 
         [HttpGet("logout")]

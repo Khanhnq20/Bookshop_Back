@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Bookshop.DTOs.User;
+using Bookshop.Entity;
 using Bookshop.SQLContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -108,6 +109,7 @@ namespace Bookshop.Controllers
             }
             
         }
+        [AllowAnonymous]
         [HttpPost("userUpdate")]
         public async Task<IActionResult> UserUpdate([FromBody]UserUpdateDTO request, string id)
         {
@@ -115,6 +117,17 @@ namespace Bookshop.Controllers
                 var update_user = _mapper.Map(request, user);
                 await _userManager.UpdateAsync(update_user);
                 return Ok();
+        }
+
+        [HttpGet("payment/verify")]
+        public async Task<IActionResult> Verify(int id)
+        {   
+            var history = await _context.PurchaseHistories.FirstOrDefaultAsync(f => f.Id == id);
+            int number = id;
+            int numberTwo = id + 2;
+            history.Verify = true;
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

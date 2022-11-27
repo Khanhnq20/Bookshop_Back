@@ -12,6 +12,7 @@ namespace Bookshop.DTOs.Payment
         public string PhoneNumber { get; set; }
         public string PaymentMethod { get; set; }
         public bool confirmStatus { get; set; }
+        public bool Verify { get; set; }
         public int DeliveryFee { get; set; }
         public string Date { get; set; }
         public List<PurchasedProductDTO> PurchasedProducts { get; set; }
