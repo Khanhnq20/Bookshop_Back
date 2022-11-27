@@ -42,9 +42,9 @@ namespace Bookshop.Controllers
         public async Task<IActionResult> CreateGenre([FromBody]GenreCreationDTO request)
         {
             var create_genre = _mapper.Map<Genre>(request);
-            await _context.Genres.AddAsync(create_genre);
+            _context.Genres.Add(create_genre);
             _context.SaveChanges();
-            return Ok("Created");
+            return Ok(create_genre);
         }
         [HttpDelete("deleteGenre")]
         public async Task<IActionResult> DeleteGenre([FromQuery] int id)
