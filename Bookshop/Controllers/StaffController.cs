@@ -74,9 +74,6 @@ namespace Bookshop.Controllers
                 string filePath = await _formFileService.UploadFileAsync(request.fileImage, "user");
                 var create_product = _mapper.Map<Product>(request);
                 create_product.fileImage = filePath;
-
-                //create_product.GenreProduct.ForEach(genre => _context.Entry(genre).State = EntityState.Unchanged);
-
                 _context.Products.Add(create_product);
                 _context.SaveChanges();
                 return Ok("Created");

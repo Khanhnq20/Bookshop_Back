@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>80684392-0348-4ace-8948-dfc17eabdbb5</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,10 +31,6 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.20.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 

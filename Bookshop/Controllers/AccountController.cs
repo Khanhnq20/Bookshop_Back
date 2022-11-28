@@ -172,7 +172,7 @@ namespace Bookshop.Controllers
             }
             else
             {
-                return BadRequest(result);
+                return BadRequest("Your Email or Password were wrong!");
             }
 
         }
@@ -229,9 +229,14 @@ namespace Bookshop.Controllers
                 return BadRequest("Cookies null");
             }
 
-            var verifiedToken = await VerifyToken(new TokenRequest() { Token = token, RefreshToken = refreshToken });
+            var verifiedToken = await VerifyToken(new TokenRequest() 
+            { 
+                Token = token, RefreshToken = refreshToken 
+            });
             
-            if(verifiedToken.GetType().GetProperty("Errors") != null  && verifiedToken?.Errors[0] == "We cannot refresh this since the token has not expired")
+            if(verifiedToken.GetType().GetProperty("Errors") != null  
+                && verifiedToken?.Errors[0] 
+                == "We cannot refresh this since the token has not expired")
             {
                 var userID = GetClaimValue(token, JwtRegisteredClaimNames.NameId);
                 var role = GetClaimValue(token,ClaimTypes.Role );

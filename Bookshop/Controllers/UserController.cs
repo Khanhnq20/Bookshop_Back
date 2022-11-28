@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Bookshop.Controllers
 {
     [ApiController]
-    [Authorize(Roles = "user")]
+    [Authorize(Roles = "user,admin,staff")]
     [Route("api/user")]
     public class UserController : Controller
     {

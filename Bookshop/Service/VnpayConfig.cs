@@ -13,7 +13,6 @@ namespace Bookshop.Service
         private SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayFilter());
         public const string VERSION = "2.1.0";
 
-        //------------------------REQUEST DATA----------------------------------------
         public void AddRequestData(string key, string value)
         {
             if (!String.IsNullOrEmpty(value))
@@ -47,7 +46,6 @@ namespace Bookshop.Service
             return baseUrl;
         }
 
-        //------------------------RESPONSE DATA----------------------------------------
         public void AddResponseData(string key, string value)
         {
             if (!String.IsNullOrEmpty(value))
@@ -88,7 +86,6 @@ namespace Bookshop.Service
                     data.Append(WebUtility.UrlEncode(kv.Key) + "=" + WebUtility.UrlEncode(kv.Value) + "&");
                 }
             }
-            //remove last '&'
             if (data.Length > 0)
             {
                 data.Remove(data.Length - 1, 1);

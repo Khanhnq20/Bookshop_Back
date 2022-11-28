@@ -24,18 +24,17 @@ namespace Bookshop.Service
 
         public string VNPayment(PurchaseHistory purchaseHistory, string returnUrl)
         {
-            //Get Config Info
-            string vnp_Returnurl = !String.IsNullOrEmpty(returnUrl) ? returnUrl : ConfigurationManager.ReturnUrl; //URL nhan ket qua tra ve 
-            string vnp_Url = ConfigurationManager.Url; //URL thanh toan cua VNPAY 
-            string vnp_TmnCode = ConfigurationManager.TmnCode; //Ma website
-            string vnp_HashSecret = ConfigurationManager.HashSecret; //Chuoi bi mat
+            string vnp_Returnurl = !String.IsNullOrEmpty(returnUrl) ? returnUrl : ConfigurationManager.ReturnUrl;
+            string vnp_Url = ConfigurationManager.Url; 
+            string vnp_TmnCode = ConfigurationManager.TmnCode; 
+            string vnp_HashSecret = ConfigurationManager.HashSecret; 
 
             if (string.IsNullOrEmpty(vnp_TmnCode) || string.IsNullOrEmpty(vnp_HashSecret))
             {
                 throw new Exception("Pls Provide Config");
             }
             string locale = "vn";
-            //Build URL for VNPAY
+ 
             VnpayConfig vnpay = new VnpayConfig();
             string host = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host.Value}";
             var hasOrigin = _httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Origin", out var origin);
